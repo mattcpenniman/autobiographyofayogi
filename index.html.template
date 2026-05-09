@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>/*TITLE*/</title>
+<style>
+  :root {
+    --bg: #faf8f4;
+    --sidebar-bg: #1a1a2e;
+    --sidebar-text: #c8c8d4;
+    --sidebar-hover: #e8d5b7;
+    --sidebar-active: #f0c67a;
+    --text: #2c2c2c;
+    --text-light: #666;
+    --accent: #c0392b;
+    --accent-light: #e74c3c;
+    --border: #e0dcd4;
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --sidebar-width: 320px;
+    --topbar-height: 56px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 18px;
+  }
+
+  /* Top bar */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--topbar-height);
+    background: var(--sidebar-bg);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .topbar-hamburger {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin-right: 12px;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  .topbar-hamburger:hover { background: rgba(255,255,255,0.1); }
+
+  .topbar-title {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .topbar-search {
+    margin-left: auto;
+    position: relative;
+  }
+
+  .topbar-search input {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 8px 14px 8px 36px;
+    border-radius: 20px;
+    font-size: 14px;
+    width: 220px;
+    outline: none;
+    transition: all 0.3s;
+    font-family: var(--font-sans);
+  }
+
+  .topbar-search input::placeholder { color: rgba(255,255,255,0.5); }
+  .topbar-search input:focus {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+    width: 280px;
+  }
+
+  .topbar-search .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.5);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    position: fixed;
+    top: var(--topbar-height);
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    z-index: 99;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    width: 0%;
+    transition: width 0.15s ease;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    top: var(--topbar-height);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    overflow-y: auto;
+    z-index: 90;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar.open { transform: translateX(0); }
+
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-header h2 {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--sidebar-hover);
+    font-weight: 600;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+  .sidebar-section-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(255,255,255,0.3);
+    padding: 16px 20px 6px;
+    font-weight: 600;
+  }
+
+  .sidebar-nav a {
+    display: block;
+    padding: 6px 20px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+
+  .sidebar-nav a:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--sidebar-hover);
+  }
+
+  .sidebar-nav a.active {
+    color: var(--sidebar-active);
+    border-left-color: var(--sidebar-active);
+    background: rgba(240,198,122,0.08);
+  }
+
+  .sidebar-nav a.chapter-link { padding-left: 32px; }
+
+  /* Overlay */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 85;
+  }
+
+  .overlay.show { display: block; }
+
+  /* Main content */
+  .main {
+    margin-top: var(--topbar-height);
+    min-height: calc(100vh - var(--topbar-height));
+  }
+
+  .content-wrapper {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+  }
+
+  /* Title page */
+  .title-page {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .title-page h1 {
+    font-size: 42px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .title-page .author {
+    font-size: 20px;
+    color: var(--text-light);
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+
+  .title-page .dedication {
+    font-size: 16px;
+    color: var(--text-light);
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Chapter headings */
+  .chapter-heading {
+    text-align: center;
+    margin: 60px 0 40px;
+    padding-top: 40px;
+  }
+
+  .chapter-heading .ch-number {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .chapter-heading h2 {
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+
+  .chapter-heading .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    margin: 0 auto;
+  }
+
+  /* Text content */
+  .content p {
+    margin-bottom: 1.2em;
+    text-indent: 1.5em;
+  }
+
+  .content p:first-of-type {
+    text-indent: 0;
+  }
+
+  .content p:first-of-type::first-letter {
+    font-size: 3.2em;
+    float: left;
+    line-height: 0.8;
+    margin: 0.1em 0.1em 0 0;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .content .no-indent { text-indent: 0; }
+
+  .content .center {
+    text-align: center;
+    text-indent: 0;
+    margin: 2em 0;
+  }
+
+  .content .section-break {
+    text-align: center;
+    margin: 2em 0;
+    color: var(--accent);
+    letter-spacing: 1em;
+    font-size: 20px;
+  }
+
+  /* Footnotes */
+  .footnotes {
+    margin-top: 3em;
+    padding-top: 2em;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--text-light);
+  }
+
+  .footnotes h3 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    color: var(--text-light);
+  }
+
+  .footnotes ol {
+    padding-left: 1.5em;
+  }
+
+  .footnotes li {
+    margin-bottom: 0.8em;
+    line-height: 1.6;
+  }
+
+  /* Chapter navigation */
+  .chapter-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    gap: 20px;
+  }
+
+  .chapter-nav a {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--text);
+    padding: 20px 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.2s;
+    flex: 1;
+    max-width: 48%;
+  }
+
+  .chapter-nav a:hover {
+    border-color: var(--accent);
+    background: rgba(192,57,43,0.03);
+  }
+
+  .chapter-nav .nav-label {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .chapter-nav .nav-title {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .chapter-nav .nav-next { text-align: right; align-items: flex-end; }
+
+  /* Search results */
+  .search-results {
+    display: none;
+    position: fixed;
+    top: var(--topbar-height);
+    right: 20px;
+    width: 400px;
+    max-height: calc(100vh - var(--topbar-height) - 20px);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    z-index: 101;
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  .search-results.show { display: flex; }
+
+  .search-results-header {
+    padding: 12px 16px;
+    background: var(--sidebar-bg);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .search-results-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px 8px;
+  }
+
+  .search-results-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0;
+  }
+
+  .search-result-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s;
+  }
+
+  .search-result-item:hover { background: #f8f8f8; }
+
+  .search-result-item .result-chapter {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .search-result-item .result-excerpt {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.5;
+  }
+
+  .search-result-item .result-excerpt mark {
+    background: #fff3cd;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+
+  /* Font size controls */
+  .font-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+  }
+
+  .font-controls button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .font-controls button:hover { background: rgba(255,255,255,0.2); }
+
+  .font-controls span {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    min-width: 36px;
+    text-align: center;
+  }
+
+  /* Bookmark button */
+  .bookmark-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-active);
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 80;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bookmark-btn:hover { transform: scale(1.1); }
+  .bookmark-btn.bookmarked { color: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .content-wrapper { padding: 40px 20px 80px; }
+    .title-page h1 { font-size: 30px; }
+    .chapter-heading h2 { font-size: 24px; }
+    body { font-size: 16px; }
+    .search-results { right: 10px; left: 10px; width: auto; }
+    .topbar-search input { width: 140px; }
+    .topbar-search input:focus { width: 180px; }
+    .chapter-nav { flex-direction: column; }
+    .chapter-nav a { max-width: 100%; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+  /* Print */
+  @media print {
+    .topbar, .sidebar, .progress-bar, .chapter-nav, .bookmark-btn, .overlay { display: none !important; }
+    .main { margin-top: 0; }
+    .content-wrapper { max-width: 100%; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <button class="topbar-hamburger" id="hamburger" aria-label="Toggle navigation">&#9776;</button>
+  <span class="topbar-title" id="topbar-title">Autobiography of a Yogi</span>
+  <div class="font-controls">
+    <button id="font-shrink" title="Decrease font size">A-</button>
+    <span id="font-size-label">18px</span>
+    <button id="font-expand" title="Increase font size">A+</button>
+  </div>
+  <div class="topbar-search">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="search-input" placeholder="Search text..." autocomplete="off">
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar"><div class="progress-bar-fill" id="progress-fill"></div></div>
+
+<!-- Sidebar -->
+<div class="overlay" id="overlay"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header"><h2>Table of Contents</h2></div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+</nav>
+
+<!-- Search results -->
+<div class="search-results" id="search-results">
+  <div class="search-results-header">
+    <span id="search-count">0 results</span>
+    <button id="search-close">&times;</button>
+  </div>
+  <div class="search-results-list" id="search-results-list"></div>
+</div>
+
+<!-- Bookmark button -->
+<button class="bookmark-btn" id="bookmark-btn" title="Bookmark this chapter">&#9733;</button>
+
+<!-- Main content -->
+<div class="main">
+  <div class="content-wrapper" id="content-wrapper"></div>
+</div>
+
+<script>
+// Embedded data
+const DATA = /*DATA*/;
+
+// State
+let currentChapter = null;
+let fontSize = 18;
+let searchIndex = [];
+
+// DOM refs
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const hamburger = document.getElementById('hamburger');
+const topbarTitle = document.getElementById('topbar-title');
+const sidebarNav = document.getElementById('sidebar-nav');
+const contentWrapper = document.getElementById('content-wrapper');
+const progressFill = document.getElementById('progress-fill');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+const searchResultsList = document.getElementById('search-results-list');
+const searchCount = document.getElementById('search-count');
+const searchClose = document.getElementById('search-close');
+const bookmarkBtn = document.getElementById('bookmark-btn');
+const fontExpand = document.getElementById('font-expand');
+const fontShrink = document.getElementById('font-shrink');
+const fontSizeLabel = document.getElementById('font-size-label');
+
+// Build sidebar TOC
+function buildSidebar() {
+  let html = '<div class="sidebar-section-label">Front Matter</div>';
+  DATA.sections.forEach((s, i) => {
+    const id = 'section-' + i;
+    html += `<a href="#${id}" data-target="${id}">${s.title}</a>`;
+  });
+  html += '<div class="sidebar-section-label">Chapters</div>';
+  DATA.chapters.forEach(ch => {
+    const id = 'chapter-' + ch.number;
+    html += `<a href="#${id}" data-target="${id}" class="chapter-link">${ch.number}. ${ch.title}</a>`;
+  });
+  sidebarNav.innerHTML = html;
+}
+
+// Render content
+function renderContent() {
+  let html = '';
+
+  // Title page
+  html += `<div class="title-page" id="title-page">
+    <h1>${DATA.title}</h1>
+    <div class="author">by ${DATA.author}</div>
+    <div class="dedication">Dedicated to the Memory of Luther Burbank<br>An American Saint</div>
+  </div>`;
+
+  // Front matter sections
+  DATA.sections.forEach((s, i) => {
+    const id = 'section-' + i;
+    html += `<div class="chapter-heading" id="${id}">
+      <div class="ch-number">Front Matter</div>
+      <h2>${s.title}</h2>
+      <div class="divider"></div>
+    </div>`;
+    html += `<div class="content">${formatContent(s.content)}</div>`;
+  });
+
+  // Chapters
+  DATA.chapters.forEach((ch, idx) => {
+    const id = 'chapter-' + ch.number;
+    html += `<div class="chapter-heading" id="${id}">
+      <div class="ch-number">Chapter ${ch.number}</div>
+      <h2>${ch.title}</h2>
+      <div class="divider"></div>
+    </div>`;
+    html += `<div class="content" id="chapter-content-${ch.number}">${formatContent(ch.content)}</div>`;
+
+    // Chapter navigation
+    if (idx > 0) {
+      const prev = DATA.chapters[idx - 1];
+      html += `<div class="chapter-nav">
+        <a href="#chapter-${prev.number}">
+          <span class="nav-label">&larr; Previous</span>
+          <span class="nav-title">${prev.number}. ${prev.title}</span>
+        </a>`;
+    }
+    if (idx < DATA.chapters.length - 1) {
+      const next = DATA.chapters[idx + 1];
+      html += `<a href="#chapter-${next.number}" class="nav-next">
+          <span class="nav-label">Next &rarr;</span>
+          <span class="nav-title">${next.number}. ${next.title}</span>
+        </a>`;
+    }
+    html += '</div>';
+  });
+
+  contentWrapper.innerHTML = html;
+}
+
+// Format content text
+function formatContent(text) {
+  // Clean up text
+  text = text.replace(/\u2014/g, '—').replace(/\u2013/g, '-').replace(/\u2012/g, '-');
+
+  // Split into paragraphs
+  const paragraphs = text.split(/\n\s*\n/);
+  let html = '';
+  let inFootnotes = false;
+
+  for (const p of paragraphs) {
+    const trimmed = p.trim();
+    if (!trimmed) continue;
+
+    // Detect footnotes section
+    if (/^footnotes?$/i.test(trimmed)) {
+      inFootnotes = true;
+      continue;
+    }
+
+    // Detect footnote items
+    if (inFootnotes && /^\d+[\.\)]\s/.test(trimmed)) {
+      html += `<p class="no-indent footnote-item">${trimmed}</p>`;
+      continue;
+    }
+
+    // Close footnotes section on blank line after
+    if (inFootnotes && trimmed === '') {
+      inFootnotes = false;
+      continue;
+    }
+
+    // Detect section breaks
+    if (/^[\*\*\*]+$/m.test(trimmed)) {
+      html += '<div class="section-break">* * *</div>';
+      continue;
+    }
+
+    // Detect centered text
+    if (/^(ILLUSTRATION|Map of India|Frontispiece)/i.test(trimmed)) {
+      html += `<p class="center">${trimmed}</p>`;
+      continue;
+    }
+
+    // Build paragraph
+    const lines = trimmed.split(/\n/).filter(l => l.trim());
+    let paraHtml = lines.map(l => {
+      let line = l.trim();
+      // Handle italics (wrapped in _)
+      line = line.replace(/_(.+?)_/g, '<em>$1</em>');
+      // Handle ALLCAPS (was italics in original)
+      if (line === line.toUpperCase() && line.length > 3) {
+        // Keep as is - these are emphasis in the source
+      }
+      return line;
+    }).join('<br>');
+
+    html += `<p>${paraHtml}</p>`;
+  }
+
+  return html;
+}
+
+// Build search index
+function buildSearchIndex() {
+  searchIndex = [];
+  DATA.chapters.forEach(ch => {
+    const text = ch.content.replace(/<[^>]*>/g, '').trim();
+    searchIndex.push({
+      chapter: ch.number,
+      title: ch.title,
+      text: text,
+      id: 'chapter-' + ch.number
+    });
+  });
+}
+
+// Search
+function doSearch(query) {
+  if (!query || query.length < 2) {
+    searchResults.classList.remove('show');
+    return;
+  }
+
+  const lower = query.toLowerCase();
+  const results = [];
+
+  for (const item of searchIndex) {
+    const idx = item.text.toLowerCase().indexOf(lower);
+    if (idx !== -1) {
+      // Get context around the match
+      const start = Math.max(0, idx - 60);
+      const end = Math.min(item.text.length, idx + query.length + 80);
+      let excerpt = item.text.substring(start, end);
+      const highlight = item.text.substring(idx, idx + query.length);
+      excerpt = excerpt.replace(new RegExp(`(${escapeRegex(query)})`, 'gi'), '<mark>$1</mark>');
+      if (start > 0) excerpt = '...' + excerpt;
+      if (end < item.text.length) excerpt = excerpt + '...';
+
+      results.push({
+        chapter: item.chapter,
+        title: item.title,
+        excerpt: excerpt,
+        id: item.id
+      });
+    }
+  }
+
+  searchCount.textContent = results.length + ' result' + (results.length !== 1 ? 's' : '');
+  searchResultsList.innerHTML = results.slice(0, 20).map(r =>
+    `<div class="search-result-item" data-target="${r.id}">
+      <div class="result-chapter">Chapter ${r.chapter}: ${r.title}</div>
+      <div class="result-excerpt">${r.excerpt}</div>
+    </div>`
+  ).join('');
+
+  if (results.length > 20) {
+    searchResultsList.innerHTML += `<div class="search-result-item" style="text-align:center;color:#999;cursor:default;">
+      ${results.length - 20} more results...
+    </div>`;
+  }
+
+  searchResults.classList.add('show');
+
+  // Bind click handlers
+  searchResultsList.querySelectorAll('.search-result-item[data-target]').forEach(el => {
+    el.addEventListener('click', () => {
+      navigateTo(el.dataset.target);
+      searchResults.classList.remove('show');
+      searchInput.value = '';
+    });
+  });
+}
+
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+// Navigation
+function navigateTo(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  // Close sidebar on mobile
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+}
+
+// Update active chapter in sidebar
+function updateActiveChapter() {
+  const scrollY = window.scrollY + 100;
+  const allLinks = sidebarNav.querySelectorAll('a');
+  let activeId = null;
+
+  for (const link of allLinks) {
+    const target = document.getElementById(link.dataset.target);
+    if (target && target.offsetTop <= scrollY) {
+      activeId = link.dataset.target;
+    }
+  }
+
+  allLinks.forEach(l => l.classList.remove('active'));
+  if (activeId) {
+    const activeLink = sidebarNav.querySelector(`a[data-target="${activeId}"]`);
+    if (activeLink) {
+      activeLink.classList.add('active');
+      // Update topbar title
+      if (activeLink.classList.contains('chapter-link')) {
+        const chNum = activeId.replace('chapter-', '');
+        const ch = DATA.chapters.find(c => c.number == chNum);
+        if (ch) topbarTitle.textContent = `Ch. ${ch.number}: ${ch.title}`;
+      } else {
+        topbarTitle.textContent = DATA.title;
+      }
+    }
+  }
+
+  // Update progress bar
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+  progressFill.style.width = progress + '%';
+
+  // Update bookmark button
+  const currentCh = DATA.chapters.find(c => 'chapter-' + c.number === activeId);
+  if (currentCh) {
+    const bookmarked = JSON.parse(localStorage.getItem('autobiographyyogi_bookmarks') || '[]');
+    const isBookmarked = bookmarked.includes(currentCh.number);
+    bookmarkBtn.innerHTML = isBookmarked ? '&#9733;' : '&#9651;';
+    bookmarkBtn.classList.toggle('bookmarked', isBookmarked);
+  }
+}
+
+// Event listeners
+hamburger.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+});
+
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+});
+
+sidebarNav.addEventListener('click', (e) => {
+  const link = e.target.closest('a');
+  if (link && link.dataset.target) {
+    e.preventDefault();
+    navigateTo(link.dataset.target);
+  }
+});
+
+searchInput.addEventListener('input', (e) => doSearch(e.target.value));
+searchClose.addEventListener('click', () => {
+  searchResults.classList.remove('show');
+  searchInput.value = '';
+});
+
+bookmarkBtn.addEventListener('click', () => {
+  if (!currentChapter) return;
+  let bookmarked = JSON.parse(localStorage.getItem('autobiographyyogi_bookmarks') || '[]');
+  if (bookmarked.includes(currentChapter)) {
+    bookmarked = bookmarked.filter(n => n !== currentChapter);
+  } else {
+    bookmarked.push(currentChapter);
+  }
+  localStorage.setItem('autobiographyyogi_bookmarks', JSON.stringify(bookmarked));
+  bookmarkBtn.innerHTML = bookmarked.includes(currentChapter) ? '&#9733;' : '&#9651;';
+  bookmarkBtn.classList.toggle('bookmarked', bookmarked.includes(currentChapter));
+});
+
+fontExpand.addEventListener('click', () => {
+  fontSize = Math.min(28, fontSize + 2);
+  document.body.style.fontSize = fontSize + 'px';
+  fontSizeLabel.textContent = fontSize + 'px';
+});
+
+fontShrink.addEventListener('click', () => {
+  fontSize = Math.max(12, fontSize - 2);
+  document.body.style.fontSize = fontSize + 'px';
+  fontSizeLabel.textContent = fontSize + 'px';
+});
+
+// Scroll handler (throttled)
+let scrollTicking = false;
+window.addEventListener('scroll', () => {
+  if (!scrollTicking) {
+    requestAnimationFrame(() => {
+      updateActiveChapter();
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    searchResults.classList.remove('show');
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+
+// Initialize
+buildSidebar();
+renderContent();
+buildSearchIndex();
+updateActiveChapter();
+</script>
+</body>
+</html>
