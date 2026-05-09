@@ -50,6 +50,21 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
 
+  .topbar-home {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin-right: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+
+  .topbar-home:hover { background: rgba(255,255,255,0.1); }
+
   .topbar-hamburger {
     background: none;
     border: none;
@@ -555,6 +570,7 @@
 
 <!-- Top bar -->
 <div class="topbar">
+  <a href="index.html" class="topbar-home" title="Back to home">&#8962;</a>
   <button class="topbar-hamburger" id="hamburger" aria-label="Toggle navigation">&#9776;</button>
   <span class="topbar-title" id="topbar-title">Autobiography of a Yogi</span>
   <div class="font-controls">

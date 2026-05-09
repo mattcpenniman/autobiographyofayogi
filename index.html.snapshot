@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>/*TITLE*/</title>
+<style>
+  :root {
+    --bg: #faf8f4;
+    --sidebar-bg: #1a1a2e;
+    --sidebar-text: #c8c8d4;
+    --sidebar-hover: #e8d5b7;
+    --sidebar-active: #f0c67a;
+    --text: #2c2c2c;
+    --text-light: #666;
+    --accent: #c0392b;
+    --accent-light: #e74c3c;
+    --border: #e0dcd4;
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 18px;
+  }
+
+  /* Hero section */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #1a1a2e 0%, #2d2d44 100%);
+    color: #fff;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(240,198,122,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-om {
+    font-size: 64px;
+    margin-bottom: 24px;
+    opacity: 0.6;
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 400;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+    max-width: 700px;
+  }
+
+  .hero .author {
+    font-size: clamp(18px, 3vw, 24px);
+    color: var(--sidebar-hover);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .hero .subtitle {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    max-width: 560px;
+    margin: 24px auto 40px;
+    line-height: 1.7;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.25s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--sidebar-active);
+    color: var(--sidebar-bg);
+  }
+
+  .btn-primary:hover {
+    background: #f5d68e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(240,198,122,0.3);
+  }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.3);
+    font-size: 24px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-item {
+    background: var(--bg);
+    padding: 32px 20px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: var(--font-sans);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+
+  .stat-label {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+
+  /* Section styles */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+
+  .section-title {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .section-heading {
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .section-desc {
+    color: var(--text-light);
+    font-size: 17px;
+    max-width: 600px;
+    margin-bottom: 40px;
+    line-height: 1.7;
+  }
+
+  /* Chapter browser */
+  .chapter-browser {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .chapter-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .chapter-card:hover {
+    border-color: var(--accent);
+    background: rgba(192,57,43,0.02);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  .chapter-num {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(192,57,43,0.08);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .chapter-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .chapter-name {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chapter-preview {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Quote section */
+  .quote-section {
+    background: var(--sidebar-bg);
+    color: #fff;
+    padding: 80px 40px;
+    text-align: center;
+  }
+
+  .quote-container {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .quote-mark {
+    font-size: 48px;
+    color: var(--sidebar-active);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  .quote-text {
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    min-height: 120px;
+    transition: opacity 0.3s;
+  }
+
+  .quote-source {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--sidebar-hover);
+    letter-spacing: 1px;
+  }
+
+  .quote-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .quote-nav button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+  }
+
+  .quote-nav button:hover { background: rgba(255,255,255,0.2); }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .timeline-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -44px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+
+  .timeline-year {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .timeline-event {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-light);
+    font-family: var(--font-sans);
+    font-size: 14px;
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .footer a:hover { text-decoration: underline; }
+
+  /* Search */
+  .search-section {
+    margin-bottom: 40px;
+  }
+
+  .search-input-wrap {
+    position: relative;
+    max-width: 400px;
+  }
+
+  .search-input-wrap input {
+    width: 100%;
+    padding: 12px 20px 12px 44px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: var(--font-serif);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input-wrap input:focus { border-color: var(--accent); }
+
+  .search-input-wrap .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .section { padding: 60px 20px; }
+    .chapter-browser { grid-template-columns: 1fr; }
+    .hero-om { font-size: 48px; }
+    .quote-text { font-size: 18px; }
+    .stat-item { padding: 24px 16px; }
+    .stat-number { font-size: 28px; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #aaa; }
+
+  /* Print */
+  @media print {
+    .hero { min-height: auto; padding: 40px 20px; }
+    .scroll-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-om">&#9789;</div>
+  <h1>Autobiography of a Yogi</h1>
+  <div class="author">by Paramhansa Yogananda</div>
+  <p class="subtitle">
+    A landmark work of spiritual literature — the life story of a yogi, 
+    chronicling encounters with saints, mystics, and sages across India 
+    and the West, and the timeless science of Kriya Yoga.
+  </p>
+  <div class="hero-cta">
+    <a href="reader.html" class="btn btn-primary">&#9654; Begin Reading</a>
+    <button class="btn btn-secondary" id="random-chapter-btn">&#10023; Random Chapter</button>
+  </div>
+  <div class="scroll-hint">&#8595;</div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-number" id="stat-chapters">48</div>
+    <div class="stat-label">Chapters</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number" id="stat-words">0</div>
+    <div class="stat-label">Words</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number" id="stat-saints">0</div>
+    <div class="stat-label">Saints &amp; Sages</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">1946</div>
+    <div class="stat-label">First Published</div>
+  </div>
+</div>
+
+<!-- Chapter Browser -->
+<section class="section" id="chapters">
+  <div class="section-title">Explore</div>
+  <h2 class="section-heading">Chapters</h2>
+  <p class="section-desc">
+    Navigate through Yogananda's journey — from his childhood in India 
+    to his mission in America. Click any chapter to begin reading.
+  </p>
+
+  <div class="search-section">
+    <div class="search-input-wrap">
+      <span class="search-icon">&#128269;</span>
+      <input type="text" id="chapter-search" placeholder="Filter chapters..." autocomplete="off">
+    </div>
+  </div>
+
+  <div class="chapter-browser" id="chapter-browser"></div>
+</section>
+
+<!-- Quote Carousel -->
+<section class="quote-section">
+  <div class="quote-container">
+    <div class="quote-mark">&#8220;</div>
+    <div class="quote-text" id="quote-text"></div>
+    <div class="quote-source" id="quote-source"></div>
+    <div class="quote-nav">
+      <button id="quote-prev" title="Previous quote">&#8592;</button>
+      <button id="quote-next" title="Next quote">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="section" id="timeline">
+  <div class="section-title">The Journey</div>
+  <h2 class="section-heading">A Life in Milestones</h2>
+  <p class="section-desc">
+    Key moments from Yogananda's extraordinary life, as recounted in the book.
+  </p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year">~1893</div>
+      <div class="timeline-event">Born Mukunda Lal Ghosh in Gorakhpur, India — with memories of a past life as a Himalayan yogi.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">~1901</div>
+      <div class="timeline-event">Healed from cholera at age 8 through the power of Lahiri Mahasaya's photograph.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1910</div>
+      <div class="timeline-event">Meets his guru, Sri Yukteswar Giri, and begins formal training in Kriya Yoga.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1915</div>
+      <div class="timeline-event">Founds the first yoga school at Ranchi, India — a pioneering institution for spiritual education.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1920</div>
+      <div class="timeline-event">Sent to America as Sri Yukteswar's emissary to spread the message of yoga and self-realization.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1932</div>
+      <div class="timeline-event">Returns to India for a final meeting with his dying guru, Sri Yukteswar.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1936</div>
+      <div class="timeline-event">Sri Yukteswar passes away. Yogananda returns to the West to continue his mission.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1946</div>
+      <div class="timeline-event"><strong>Autobiography of a Yogi</strong> is published — becoming one of the most influential spiritual books of the 20th century.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<div class="footer">
+  <p>Text from <a href="https://www.gutenberg.org/ebooks/7452" target="_blank" rel="noopener">Project Gutenberg</a> &middot; 
+  <a href="reader.html">Open full reader</a></p>
+</div>
+
+<script>
+// Embedded data
+const DATA = /*DATA*/;
+
+// Chapter previews (first few words of each chapter)
+function getChapterPreview(chapter) {
+  const text = chapter.content.replace(/\n+/g, ' ').trim();
+  const words = text.split(/\s+/).slice(0, 15).join(' ');
+  return words.length > 100 ? words.substring(0, 100) + '...' : words;
+}
+
+// Build chapter browser
+function buildChapterBrowser(filter = '') {
+  const browser = document.getElementById('chapter-browser');
+  const lower = filter.toLowerCase();
+  
+  const filtered = DATA.chapters.filter(ch => {
+    if (!lower) return true;
+    return ch.title.toLowerCase().includes(lower) || 
+           String(ch.number).includes(lower);
+  });
+
+  browser.innerHTML = filtered.map(ch => {
+    const preview = getChapterPreview(ch);
+    return `<a href="reader.html#chapter-${ch.number}" class="chapter-card">
+      <div class="chapter-num">${ch.number}</div>
+      <div class="chapter-info">
+        <div class="chapter-name">${ch.title}</div>
+        <div class="chapter-preview">${preview}</div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// Chapter search
+document.getElementById('chapter-search').addEventListener('input', (e) => {
+  buildChapterBrowser(e.target.value);
+});
+
+// Random chapter
+document.getElementById('random-chapter-btn').addEventListener('click', () => {
+  const ch = DATA.chapters[Math.floor(Math.random() * DATA.chapters.length)];
+  window.location.href = `reader.html#chapter-${ch.number}`;
+});
+
+// Word count
+function countWords() {
+  let total = 0;
+  DATA.chapters.forEach(ch => {
+    total += ch.content.split(/\s+/).filter(w => w).length;
+  });
+  DATA.sections.forEach(s => {
+    total += s.content.split(/\s+/).filter(w => w).length;
+  });
+  return total;
+}
+
+// Animate stat numbers
+function animateNumber(el, target, duration = 1200) {
+  const start = 0;
+  const startTime = performance.now();
+  
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(start + (target - start) * eased);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// Count unique saints/sages mentioned (approximate from chapter titles)
+function countSaints() {
+  const saintKeywords = ['saint', 'swami', 'master', 'guru', 'yogi', 'mahasaya', 'mother', 'baba', 'gandhi', 'tagore', 'burbank', 'neumann', 'khan', 'bose', 'babaji', 'lahiri', 'yukteswar'];
+  let count = 0;
+  DATA.chapters.forEach(ch => {
+    const lower = ch.title.toLowerCase();
+    if (saintKeywords.some(kw => lower.includes(kw))) count++;
+  });
+  return Math.max(count, 12);
+}
+
+// Quotes from the book
+const quotes = [
+  { text: "The butterfly does not recollect its chrysalis, but it is the chrysalis that makes the butterfly.", source: "Paramhansa Yogananda" },
+  { text: "If you realize God, you will be as happy in a prison cell as in paradise.", source: "Chapter 1" },
+  { text: "The greatest miracle is to see the divine in every human being.", source: "Paramhansa Yogananda" },
+  { text: "Man is not a bubble blown haphazardly on the stream of life, nor is he an accident of nature.", source: "Chapter 1" },
+  { text: "The more you give, the more there is in you to give.", source: "Paramhansa Yogananda" },
+  { text: "When you have nothing more to give, you will have everything to receive.", source: "Paramhansa Yogananda" },
+  { text: "The soul is the only true reality; everything else is a dream.", source: "Chapter 10" },
+  { text: "God is not a reward for the good, nor the punishment of the wicked. He is the reality behind all.", source: "Paramhansa Yogananda" },
+];
+
+let currentQuote = 0;
+
+function showQuote(index) {
+  const textEl = document.getElementById('quote-text');
+  const sourceEl = document.getElementById('quote-source');
+  textEl.style.opacity = 0;
+  setTimeout(() => {
+    textEl.textContent = quotes[index].text;
+    sourceEl.textContent = `— ${quotes[index].source}`;
+    textEl.style.opacity = 1;
+  }, 300);
+}
+
+document.getElementById('quote-next').addEventListener('click', () => {
+  currentQuote = (currentQuote + 1) % quotes.length;
+  showQuote(currentQuote);
+});
+
+document.getElementById('quote-prev').addEventListener('click', () => {
+  currentQuote = (currentQuote - 1 + quotes.length) % quotes.length;
+  showQuote(currentQuote);
+});
+
+// Intersection observer for stat animation
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateNumber(document.getElementById('stat-words'), countWords());
+      animateNumber(document.getElementById('stat-saints'), countSaints());
+      statsObserver.disconnect();
+    }
+  });
+}, { threshold: 0.5 });
+
+statsObserver.observe(document.querySelector('.stats-bar'));
+
+// Initialize
+buildChapterBrowser();
+showQuote(0);
+</script>
+</body>
+</html>

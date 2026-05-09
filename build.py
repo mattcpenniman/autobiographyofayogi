@@ -39,18 +39,22 @@ for block in chapters[1:]:
     lowercase_words = {'and', 'the', 'an', 'of', 'in', 'to', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'is', 'or', 'but', 'not', 'so', 'if', 'no', 'up', 'he', 'she', 'we', 'they', 'me', 'him', 'us', 'them', 'am', 'be', 'its', 'our', 'your', 'their', 'was', 'are'}
     title_words = []
     for idx, w in enumerate(words):
-        clean = w.strip('-"\'(),.')
-        if not clean:
-            title_words.append(w)
-            continue
-        # Extract prefix/suffix punctuation
+        # Extract prefix/suffix punctuation (before stripping)
         prefix = ''
         suffix = ''
         for c in w:
             if c in '"\'(':
                 prefix += c
-            elif c in '),.':
+        # Only capture trailing commas and parens, not dots (dots may be part of abbreviations)
+        for c in reversed(w):
+            if c in '),':
                 suffix = c + suffix
+            else:
+                break
+        clean = w.strip('-"\'(),.')
+        if not clean:
+            title_words.append(w)
+            continue
         # Handle single-letter words first
         if len(clean) == 1:
             if w.endswith('.'):
@@ -60,18 +64,21 @@ for block in chapters[1:]:
             else:
                 title_words.append(prefix + clean.lower() + suffix)
             continue
-        # Handle abbreviations like "J.c.." - split on dots
-        if '.' in clean:
-            parts = clean.split('.')
-            cleaned_parts = [p for p in parts if p]
+        # Handle abbreviations like "J.C." - split on internal dots
+        if '.' in w:
+            parts = w.split('.')
+            cleaned_parts = [p.strip('-"\'(),.') for p in parts if p.strip('-"\'(),.')]
             new_clean = '.'.join(p.capitalize() for p in cleaned_parts)
-            is_lower = new_clean.lower() in lowercase_words
+            # Preserve trailing dot if original had it
+            if w.endswith('.'):
+                new_clean += '.'
+            is_lower = new_clean.lower().rstrip('.') in lowercase_words
             if idx == 0 and new_clean[0] not in '"\'(':
                 is_lower = False
             if is_lower:
                 title_words.append(prefix + new_clean.lower() + suffix)
             else:
-                title_words.append(prefix + new_clean.capitalize() + suffix)
+                title_words.append(prefix + new_clean + suffix)
             continue
         is_lower = clean.lower() in lowercase_words
         # First word is always capitalized (unless it's a quote)
@@ -167,14 +174,29 @@ with open('text/text_data.json', 'w', encoding='utf-8') as f:
 print(f"Parsed {len(data['sections'])} frontmatter sections and {len(chapter_data)} chapters")
 print(f"Total text size: {sum(len(c['content']) for c in chapter_data)} chars")
 
-# --- Generate interactive HTML ---
-html_template = open('index.html.template', encoding='utf-8').read()
+# --- Generate reader.html (full book reader) ---
+reader_template = open('index.html.template', encoding='utf-8').read()
 
 # Embed data as JSON
 data_json = json.dumps(data, ensure_ascii=False)
-html = html_template.replace('/*DATA*/', data_json)
+reader_html = reader_template.replace('/*DATA*/', data_json)
+# Set page title
+reader_html = reader_html.replace('/*TITLE*/', 'Read: Autobiography of a Yogi')
+
+with open('reader.html', 'w', encoding='utf-8') as f:
+    f.write(reader_html)
+
+print("Generated reader.html")
+
+# --- Generate index.html (interactive landing page) ---
+index_template = open('index.html.snapshot', encoding='utf-8').read()
+
+# Embed data as JSON (landing page also needs chapter data)
+index_html = index_template.replace('/*DATA*/', data_json)
+# Set page title
+index_html = index_html.replace('/*TITLE*/', 'Autobiography of a Yogi')
 
 with open('index.html', 'w', encoding='utf-8') as f:
-    f.write(html)
+    f.write(index_html)
 
-print("Generated index.html")
+print("Generated index.html (interactive landing page)")
