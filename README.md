@@ -11,7 +11,7 @@ This project is a lightweight, static website for presenting an interactive expe
 ## Current structure
 
 - [index.html](/mnt/www/map/polloanalytics.com/public_html/autobioyogi/index.html): homepage, styling, data, and rendering logic.
-- [reader.html](/mnt/www/map/polloanalytics.com/public_html/autobioyogi/reader.html): simple redirect to the chapter explorer.
+- [reader.html](/mnt/www/map/polloanalytics.com/public_html/autobioyogi/reader.html): full-text reader with chapter navigation and search.
 - [AGENTS.md](/mnt/www/map/polloanalytics.com/public_html/autobioyogi/AGENTS.md): maintainer notes for humans and coding agents.
 - [index.legacy.html](/mnt/www/map/polloanalytics.com/public_html/autobioyogi/index.legacy.html): old broken/generated homepage kept for reference.
 - [reader.legacy.html](/mnt/www/map/polloanalytics.com/public_html/autobioyogi/reader.legacy.html): old generated reader kept for reference.

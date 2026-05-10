@@ -13,7 +13,7 @@ This repo is now designed so a human or agent can make content changes quickly w
 - `index.html`
   Live homepage, CSS, data, and JavaScript rendering.
 - `reader.html`
-  Redirects old reader links to `#chapters`.
+  Full-text reader for people who want to read the whole book.
 - `README.md`
   Human-friendly quickstart.
 - `index.legacy.html`, `reader.legacy.html`
