@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Labyrinth of Selves: An Interactive Exploration</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --primary-color: #e0e0e0;
+            --secondary-color: #0f3460;
+            --accent-color: #e94560;
+            --text-light: #f0f0f0;
+            --text-dark: #a0a0a0;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --panel-bg: rgba(255, 255, 255, 0.05);
+            --panel-border: rgba(255, 255, 255, 0.15);
+            --glow-color: rgba(233, 69, 96, 0.4);
+            --font-family-primary: 'Segoe UI', 'Roboto', sans-serif;
+            --font-family-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+            --transition-speed: 0.3s ease-in-out;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 16px;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--primary-color);
+            margin-bottom: 0.8em;
+            line-height: 1.2;
+        }
+
+        h1 { font-size: 2.8em; }
+        h2 { font-size: 2.2em; }
+        h3 { font-size: 1.8em; }
+        h4 { font-size: 1.4em; }
+        p { margin-bottom: 1em; color: var(--text-dark); }
+        a { color: var(--accent-color); text-decoration: none; transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-color); }
+
+        /* Layout */
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--secondary-color);
+            padding: 20px 0;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: transform var(--transition-speed);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5em;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar nav ul li a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--text-light);
+            font-size: 1.1em;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .sidebar nav ul li a.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left var(--transition-speed);
+            position: relative;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 0;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(rgba(26, 26, 46, 0.8), rgba(26, 26, 46, 0.8)), url('https://via.placeholder.com/1920x1080/0f3460/e0e0e0?text=Abstract+Labyrinth') no-repeat center center/cover;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(233, 69, 96, 0.1) 0%, transparent 70%);
+            animation: subtle-glow 15s infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes subtle-glow {
+            0% { transform: scale(1); opacity: 0.7; }
+            100% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        .hero-section h1 {
+            font-size: 4em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--glow-color);
+            color: var(--primary-color);
+        }
+
+        .hero-section h2 {
+            font-size: 1.8em;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .hero-summary {
+            max-width: 800px;
+            font-size: 1.2em;
+            color: var(--text-light);
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Panel Styling (Glassmorphism) */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel:hover {
+            box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.5), 0 0 20px var(--glow-color);
+            transform: translateY(-2px);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        /* Collapsible Sections */
+        .collapsible-header {
+            cursor: pointer;
+            padding: 15px 20px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color var(--transition-speed);
+            border: 1px solid var(--border-color);
+        }
+
+        .collapsible-header:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .collapsible-header h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .collapsible-icon {
+            font-size: 1.2em;
+            transition: transform var(--transition-speed);
+        }
+
+        .collapsible-header.expanded .collapsible-icon {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+            padding: 0 20px;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 1000px; /* Arbitrary large value */
+            opacity: 1;
+            padding: 15px 20px;
+        }
+
+        /* Knowledge Map */
+        #knowledge-map {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .map-node {
+            position: absolute;
+            background-color: var(--secondary-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            color: var(--primary-color);
+            padding: 5px;
+        }
+
+        .map-node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--glow-color);
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .map-node.active {
+            border-color: var(--primary-color);
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            transform: scale(1.15);
+            box-shadow: 0 0 25px var(--glow-color);
+        }
+
+        .map-line {
+            position: absolute;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform-origin: 0 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Chapter Explorer */
+        .chapter-explorer ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .chapter-explorer > ul {
+            padding-left: 0;
+        }
+
+        .chapter-explorer li {
+            margin-bottom: 5px;
+        }
+
+        .chapter-item {
+            cursor: pointer;
+            padding: 8px 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color var(--transition-speed);
+            color: var(--text-light);
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .chapter-item.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .chapter-toggle {
+            font-size: 0.8em;
+            margin-left: 10px;
+            transition: transform var(--transition-speed);
+        }
+
+        .chapter-item.expanded .chapter-toggle {
+            transform: rotate(90deg);
+        }
+
+        .chapter-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding-left: 15px;
+        }
+
+        .chapter-content.expanded {
+            max-height: 500px; /* Adjust as needed */
+        }
+
+        /* Search System */
+        .search-bar {
+            margin-bottom: 30px;
+            display: flex;
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 15px 20px;
+            border: 1px solid var(--panel-border);
+            background-color: var(--panel-bg);
+            color: var(--text-light);
+            border-radius: 8px;
+            font-size: 1.1em;
+            outline: none;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .search-bar input::placeholder {
+            color: var(--text-dark);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .search-result-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: background-color var(--transition-speed);
+            cursor: pointer;
+        }
+
+        .search-result-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .search-result-item h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .search-result-item p {
+            color: var(--text-dark);
+            font-size: 0.95em;
+        }
+
+        /* Quote Intelligence */
+        .quote-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .quote-text {
+            font-style: italic;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .quote-meta {
+            font-size: 0.9em;
+            color: var(--text-dark);
+            text-align: right;
+        }
+
+        .quote-analysis-toggle {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+
+        .quote-analysis-toggle:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+
+        .quote-analysis-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .quote-analysis-content.expanded {
+            max-height: 800px; /* Arbitrary large value */
+            opacity: 1;
+        }
+
+        /* Timeline View */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background-color: var(--border-color);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-item-content {
+            width: 45%;
+            padding: 20px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all var(--transition-speed);
+        }
+
+        .timeline-item-content:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 10px var(--glow-color);
+            transform: translateY(-2px);
+        }
+
+        .timeline-item:nth-child(even) .timeline-item-content {
+            margin-right: 5%;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-item-content {
+            margin-left: 5%;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+        }
+
+        .timeline-item-content h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .timeline-item-content .date {
+            font-size: 0.9em;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: var(--text-dark);
+        }
+
+        .breadcrumbs a {
+            color: var(--text-dark);
+        }
+
+        .breadcrumbs a:hover {
+            color: var(--accent-color);
+        }
+
+        .breadcrumbs span {
+            margin: 0 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 250px;
+            }
+            .hero-section h1 { font-size: 3em; }
+            .hero-section h2 { font-size: 1.5em; }
+            .hero-summary { font-size: 1.1em; }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                transform: translateX(0);
+                box-shadow: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .sidebar.collapsed {
+                max-height: var(--header-height);
+                overflow: hidden;
+            }
+            .sidebar-toggle {
+                display: block;
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background-color: var(--accent-color);
+                color: var(--primary-color);
+                padding: 8px 12px;
+                border-radius: 5px;
+                cursor: pointer;
+                z-index: 1001;
+            }
+            .main-content {
+                margin-left: 0;
+                padding-top: 20px; /* Adjust for potential fixed header */
+            }
+            .hero-section {
+                min-height: 60vh;
+            }
+            .hero-section h1 { font-size: 2.5em; }
+            .hero-section h2 { font-size: 1.2em; }
+            .hero-summary { font-size: 1em; padding: 15px; }
+
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                flex-direction: column !important;
+            }
+            .timeline-item-content {
+                width: calc(100% - 40px);
+                margin-left: 40px !important;
+                margin-right: 0 !important;
+            }
+            .timeline-marker {
+                left: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section h1 { font-size: 2em; }
+            .hero-section h2 { font-size: 1em; }
+            .panel { padding: 20px; }
+            .collapsible-header { padding: 10px 15px; }
+            .collapsible-content { padding: 10px 15px; }
+            .map-node { width: 80px; height: 80px; font-size: 0.8em; }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .flex-grow { flex-grow: 1; }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Labyrinth of Selves</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" data-section="home" class="active">HOME</a></li>
+                <li><a href="reader.html" data-section="reader">READER</a></li>
+                <li><a href="#" data-section="map">MAP</a></li>
+                <li><a href="#" data-section="themes">THEMES</a></li>
+                <li><a href="#" data-section="chapters">CHAPTERS</a></li>
+                <li><a href="#" data-section="symbolism">SYMBOLISM</a></li>
+                <li><a href="#" data-section="quotes">QUOTES</a></li>
+                <li><a href="#" data-section="philosophy">PHILOSOPHY</a></li>
+                <li><a href="#" data-section="related">RELATED</a></li>
+                <li><a href="#" data-section="search">SEARCH</a></li>
+                <li><a href="#" data-section="timeline">TIMELINE</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="breadcrumbs" id="breadcrumbs"></div>
+
+        <!-- Hero Section -->
+        <section id="home-section" class="hero-section">
+            <h1>The Labyrinth of Selves</h1>
+            <h2>A Philosophical Journey into Identity and Consciousness</h2>
+            <p class="hero-summary">
+                Dr. Elara Vance's seminal work, "The Labyrinth of Selves," invites readers on an allegorical journey through a multi-dimensional maze, where each turn challenges the protagonist's perception of self, reality, and free will. This interactive exploration system transforms the book into a living knowledge map, guiding you through interconnected concepts, layered analyses, and profound philosophical insights. Immerse yourself in a cinematic reading experience that redefines intellectual engagement.
+            </p>
+        </section>
+
+        <!-- Main Analysis Panel (Dynamic Content) -->
+        <section id="dynamic-content-panel" class="panel hidden">
+            <div class="panel-header">
+                <h3 id="panel-title"></h3>
+            </div>
+            <div id="panel-content">
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </section>
+
+        <!-- Knowledge Map Section -->
+        <section id="map-section" class="panel hidden">
+            <div class="panel-header">
+                <h3>Interactive Knowledge Map</h3>
+            </div>
+            <div id="knowledge-map">
+                <!-- Nodes and lines will be rendered here by JS -->
+            </div>
+        </section>
+
+        <!-- Chapter Explorer Section -->
+        <section id="chapters-section" class="panel hidden">
+            <div class="panel-header">
+                <h3>Chapter Explorer</h3>
+            </div>
+            <div id="chapter-explorer" class="chapter-explorer">
+                <!-- Chapters will be rendered here by JS -->
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search-section" class="panel hidden">
+            <div class="panel-header">
+                <h3>Search Concepts</h3>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search themes, concepts, quotes...">
+            </div>
+            <div id="search-results" class="search-results">
+                <!-- Search results will appear here -->
+            </div>
+        </section>
+
+        <!-- Quotes Section -->
+        <section id="quotes-section" class="panel hidden">
+            <div class="panel-header">
+                <h3>Quote Intelligence</h3>
+            </div>
+            <div id="quotes-list">
+                <!-- Quotes will be rendered here by JS -->
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section id="timeline-section" class="panel hidden">
+            <div class="panel-header">
+                <h3>Timeline View</h3>
+            </div>
+            <div id="timeline-container" class="timeline">
+                <!-- Timeline items will be rendered here by JS -->
+            </div>
+        </section>
+
+        <!-- Placeholder sections for other navigation items -->
+        <section id="themes-section" class="panel hidden">
+            <div class="panel-header"><h3>Themes</h3></div>
+            <div id="themes-content"></div>
+        </section>
+        <section id="symbolism-section" class="panel hidden">
+            <div class="panel-header"><h3>Symbolism</h3></div>
+            <div id="symbolism-content"></div>
+        </section>
+        <section id="philosophy-section" class="panel hidden">
+            <div class="panel-header"><h3>Philosophy</h3></div>
+            <div id="philosophy-content"></div>
+        </section>
+        <section id="related-section" class="panel hidden">
+            <div class="panel-header"><h3>Related Concepts</h3></div>
+            <div id="related-content"></div>
+        </section>
+
+    </div>
+
+    <script>
+        const appState = {
+            currentSection: 'home',
+            activeNode: null,
+            expandedPanels: {},
+            searchQuery: '',
+            navigationHistory: ['home']
+        };
+
+        const bookData = {
+            title: "Autobiography of a Yogi",
+            author: "Paramahansa Yogananda",
+            genre: "Spiritual, Memoir, Philosophy",
+            publication: "1946, Self-Realization Fellowship",
+            summary: `Paramahansa Yogananda's "Autobiography of a Yogi" is a spiritual classic that introduces Western readers to the life and teachings of a modern Indian yogi. It chronicles Yogananda's spiritual quest, his encounters with numerous saints and sages, and his eventual mission to bring the ancient science of Kriya Yoga to the West. The book delves into profound spiritual experiences, the nature of reality, the power of meditation, and the path to self-realization. It offers a unique blend of Eastern mysticism and practical spiritual guidance, inspiring millions to explore deeper dimensions of consciousness and inner peace.`,
+            themes: [
+                {
+                    id: 'self-realization',
+                    title: 'Self-Realization & Enlightenment',
+                    layer1: 'The central theme, exploring the journey to understand one's true divine nature beyond the ego.',
+                    layer2: 'Yogananda's life is a testament to the pursuit of self-realization, detailing his intense spiritual practices, encounters with enlightened masters, and the gradual unfolding of his own divine consciousness. The book emphasizes that enlightenment is not a distant goal but an inherent potential within every individual, accessible through dedicated spiritual effort.',
+                    layer3: 'Drawing heavily from ancient yogic philosophy, particularly the teachings of Patanjali's Yoga Sutras and the Bhagavad Gita, this theme highlights the process of transcending egoic identification to realize the Atman (soul) as one with Brahman (God). It contrasts with Western psychological concepts of self by positing a universal, divine Self.',
+                    layer4: 'Cross-disciplinary analysis connects this to transpersonal psychology (peak experiences, spiritual emergencies), comparative religion (mystical traditions across faiths), and even modern physics (unity of consciousness, interconnectedness of all things). The narrative provides experiential evidence for concepts often considered purely theoretical.',
+                    layer5: 'Practical implications include the adoption of meditation and Kriya Yoga practices, cultivating introspection, developing unconditional love and compassion, and living a life aligned with higher spiritual values. It encourages a shift from material pursuits to inner spiritual growth as the ultimate purpose of human existence.'
+                },
+                {
+                    id: 'kriya-yoga',
+                    title: 'Kriya Yoga & Spiritual Practice',
+                    layer1: 'Explains the scientific technique of Kriya Yoga as a fast path to spiritual evolution.',
+                    layer2: 'The book serves as a primary introduction to Kriya Yoga, a specific meditation technique taught by Lahiri Mahasaya and his lineage. Yogananda describes its principles, benefits, and the profound impact it had on his own spiritual development. It is presented as a practical, scientific method for accelerating spiritual growth and achieving union with the Divine.',
+                    layer3: 'This theme delves into the mechanics of Kriya Yoga, explaining how it works on the subtle energy (prana) in the spine and brain to purify the body and mind, leading to higher states of consciousness. It is rooted in ancient tantric and yogic traditions, emphasizing direct experience over dogma. The philosophical underpinnings relate to the concept of karma and liberation (moksha).',
+                    layer4: 'Connects to neurotheology (the study of brain activity during spiritual experiences), psychosomatic medicine (mind-body connection), and the growing scientific interest in meditation's effects on well-being. The book presents Kriya Yoga as a verifiable spiritual science, not just a belief system.',
+                    layer5: 'Practical implications involve learning and practicing Kriya Yoga under proper guidance, integrating spiritual discipline into daily life, and understanding the importance of a guru (spiritual teacher) in one's journey. It emphasizes consistency, devotion, and the transformative power of sustained spiritual effort.'
+                },
+                {
+                    id: 'guru-disciple',
+                    title: 'Guru-Disciple Relationship',
+                    layer1: 'Highlights the sacred and transformative bond between a spiritual teacher (guru) and student (disciple).',
+                    layer2: 'Yogananda's relationship with his guru, Sri Yukteswar Giri, is a cornerstone of the autobiography. The book vividly portrays the profound love, unwavering faith, and rigorous training involved in this sacred bond. It illustrates how a true guru guides, tests, and ultimately liberates the disciple from ignorance.',
+                    layer3: 'This theme explores the traditional Indian concept of the guru as a spiritual preceptor who has attained self-realization and can guide others on the path. It emphasizes the transmission of spiritual power and wisdom from guru to disciple, often beyond intellectual understanding. The philosophy behind it involves the idea of divine grace working through the guru.',
+                    layer4: 'Relates to mentorship in various fields, but with a unique spiritual dimension. It touches on the psychology of influence, trust, and surrender in a transformative relationship. Comparative studies with other spiritual traditions (e.g., Zen masters, Sufi sheikhs) reveal similar dynamics.',
+                    layer5: 'Practical implications include seeking genuine spiritual guidance, cultivating humility and receptivity, and understanding the role of faith and devotion in spiritual progress. It underscores that while self-effort is crucial, divine grace, often channeled through a guru, is equally vital for ultimate liberation.'
+                }
+            ],
+            chapters: [
+                {
+                    id: 'ch1',
+                    title: 'Chapter 1: My Parents and Early Life',
+                    summary: 'Yogananda recounts his childhood in Gorakhpur, India, his spiritual inclinations from a young age, and his early encounters with saints.',
+                    concepts: ['Childhood', 'Spiritual Inclinations', 'Early Saints'],
+                    quotes: ['q1', 'q2']
+                },
+                {
+                    id: 'ch2',
+                    title: 'Chapter 2: My Mother's Death and the Mystic Amulet',
+                    summary: 'The profound impact of his mother's passing and a miraculous experience involving a mystic amulet that deepens his spiritual resolve.',
+                    concepts: ['Loss', 'Miracle', 'Spiritual Resolve'],
+                    quotes: ['q3']
+                },
+                {
+                    id: 'ch3',
+                    title: 'Chapter 3: The Saint with Two Bodies (Swami Pranabananda)',
+                    summary: 'Yogananda's encounter with Swami Pranabananda, a yogi who could be in two places simultaneously, illustrating the extraordinary powers attainable through yoga.',
+                    concepts: ['Yogic Powers', 'Bilocation', 'Divine Manifestation'],
+                    quotes: ['q4']
+                }
+            ],
+            symbolism: [
+                {
+                    id: 'kriya-yoga-sym',
+                    title: 'Kriya Yoga',
+                    description: 'Symbolizes the scientific path to God-realization, a direct highway to the Infinite. It represents the practical application of spiritual laws.',
+                    relatedThemes: ['self-realization', 'kriya-yoga']
+                },
+                {
+                    id: 'guru-sym',
+                    title: 'The Guru',
+                    description: 'Symbolizes divine wisdom, grace, and the guiding light on the spiritual path. The guru is a living embodiment of truth and a conduit for spiritual transmission.',
+                    relatedThemes: ['guru-disciple', 'self-realization']
+                },
+                {
+                    id: 'india-sym',
+                    title: 'India',
+                    description: 'Symbolizes the ancient spiritual heritage, the land of yogis and saints, and the birthplace of profound spiritual wisdom.',
+                    relatedThemes: ['self-realization', 'kriya-yoga']
+                }
+            ],
+            quotes: [
+                {
+                    id: 'q1',
+                    text: '"The true basis of religion is not belief, but intuitive experience."',
+                    chapter: 'ch1',
+                    interpretation: 'This quote encapsulates Yogananda's emphasis on direct spiritual experience over blind faith, a cornerstone of his teachings and the yogic path.',
+                    thematicSignificance: 'Highlights the theme of Self-Realization, stressing experiential knowledge.',
+                    philosophicalImplications: 'Aligns with empirical and experiential philosophies, contrasting with purely dogmatic religious approaches.'
+                },
+                {
+                    id: 'q2',
+                    text: '"God is simple. Everything else is complex."',
+                    chapter: 'ch1',
+                    interpretation: 'A profound statement on the ultimate simplicity of divine truth, suggesting that human intellect often overcomplicates spiritual understanding.',
+                    thematicSignificance: 'Relates to Self-Realization, implying that the path to God is straightforward once distractions are removed.',
+                    philosophicalImplications: 'Echoes mystical traditions that emphasize direct, unmediated apprehension of the divine.'
+                },
+                {
+                    id: 'q3',
+                    text: '"The season of failure is the best time for sowing the seeds of success."',
+                    chapter: 'ch2',
+                    interpretation: 'This quote, often attributed to Yogananda, reflects resilience and the transformative power of adversity, a common thread in spiritual journeys.',
+                    thematicSignificance: 'Connects to the perseverance required for Kriya Yoga & Spiritual Practice.',
+                    philosophicalImplications: 'A practical philosophy of growth through challenge, akin to stoicism in its embrace of difficulty.'
+                },
+                {
+                    id: 'q4',
+                    text: '"The one who is not attached to the fruits of his work, but always does his duty, is the true renunciate and the true yogi."',
+                    chapter: 'ch3',
+                    interpretation: 'This quote, a paraphrase of a Bhagavad Gita teaching, emphasizes selfless action (karma yoga) as a path to spiritual liberation, a core principle for Yogananda.',
+                    thematicSignificance: 'Central to Kriya Yoga & Spiritual Practice, highlighting the importance of detachment.',
+                    philosophicalImplications: 'A key tenet of Karma Yoga, advocating for action without attachment to results, leading to inner freedom.'
+                }
+            ],
+            philosophy: [
+                {
+                    id: 'yoga-philosophy',
+                    title: 'Yoga Philosophy',
+                    summary: 'The ancient Indian philosophical system encompassing physical, mental, and spiritual practices aimed at achieving liberation and union with the divine. The book is a practical guide to its principles.',
+                    keyThinkers: ['Patanjali', 'Vyasa', 'Adi Shankara'],
+                    relatedThemes: ['self-realization', 'kriya-yoga', 'consciousness']
+                },
+                {
+                    id: 'vedanta',
+                    title: 'Vedanta',
+                    summary: 'One of the six orthodox schools of Hindu philosophy, primarily concerned with the nature of ultimate reality (Brahman) and the self (Atman). Yogananda's teachings are deeply rooted in Advaita Vedanta.',
+                    keyThinkers: ['Adi Shankara', 'Ramanuja', 'Madhva'],
+                    relatedThemes: ['self-realization', 'consciousness', 'divinity']
+                }
+            ],
+            timeline: [
+                {
+                    year: '1893',
+                    title: 'Birth of Yogananda',
+                    description: 'Mukunda Lal Ghosh (later Paramahansa Yogananda) is born in Gorakhpur, India.',
+                    type: 'biographical'
+                },
+                {
+                    year: '1910',
+                    title: 'Meeting Sri Yukteswar',
+                    description: 'Yogananda meets his guru, Swami Sri Yukteswar Giri, a pivotal moment in his spiritual journey.',
+                    type: 'biographical'
+                },
+                {
+                    year: '1917',
+                    title: 'Founding Yogoda Satsanga Society',
+                    description: 'Yogananda establishes a school in Dihika, laying the groundwork for his spiritual mission.',
+                    type: 'biographical'
+                },
+                {
+                    year: '1920',
+                    title: 'Arrival in America',
+                    description: 'Yogananda travels to the United States to speak at the International Congress of Religious Liberals in Boston.',
+                    type: 'biographical'
+                },
+                {
+                    year: '1925',
+                    title: 'Founding Self-Realization Fellowship',
+                    description: 'Establishes the international headquarters for Self-Realization Fellowship in Los Angeles.',
+                    type: 'biographical'
+                },
+                {
+                    year: '1946',
+                    title: 'Publication of Autobiography of a Yogi',
+                    description: 'The seminal work is published, introducing millions to Kriya Yoga and Eastern spirituality.',
+                    type: 'literary'
+                },
+                {
+                    year: '1952',
+                    title: 'Mahasamadhi',
+                    description: 'Paramahansa Yogananda enters mahasamadhi (a yogi's conscious exit from the body) in Los Angeles.',
+                    type: 'biographical'
+                }
+            ],
+            knowledgeMapNodes: [
+                { id: 'book', label: 'Autobiography of a Yogi', x: 50, y: 50, type: 'book' },
+                { id: 'self-realization', label: 'Self-Realization', x: 200, y: 100, type: 'theme' },
+                { id: 'kriya-yoga', label: 'Kriya Yoga', x: 350, y: 50, type: 'theme' },
+                { id: 'guru-disciple', label: 'Guru-Disciple', x: 200, y: 200, type: 'theme' },
+                { id: 'yogananda', label: 'Yogananda (Author)', x: 250, y: 300, type: 'character' },
+                { id: 'sri-yukteswar', label: 'Sri Yukteswar (Guru)', x: 100, y: 200, type: 'character' },
+                { id: 'yoga-phil', label: 'Yoga Philosophy', x: 100, y: 400, type: 'philosophy' },
+                { id: 'vedanta-phil', label: 'Vedanta', x: 400, y: 400, type: 'philosophy' },
+                { id: 'india-sym', label: 'India (Symbol)', x: 50, y: 250, type: 'symbolism' }
+            ],
+            knowledgeMapEdges: [
+                { from: 'book', to: 'self-realization' },
+                { from: 'book', to: 'kriya-yoga' },
+                { from: 'book', to: 'guru-disciple' },
+                { from: 'self-realization', to: 'yogananda' },
+                { from: 'kriya-yoga', to: 'yogananda' },
+                { from: 'guru-disciple', to: 'yogananda' },
+                { from: 'yogananda', to: 'sri-yukteswar' },
+                { from: 'yoga-phil', to: 'kriya-yoga' },
+                { from: 'vedanta-phil', to: 'self-realization' },
+                { from: 'india-sym', to: 'yogananda' }
+            ]
+        };
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const navLinks = document.querySelectorAll('.sidebar nav ul li a');
+        const dynamicContentPanel = document.getElementById('dynamic-content-panel');
+        const panelTitle = document.getElementById('panel-title');
+        const panelContent = document.getElementById('panel-content');
+        const breadcrumbsContainer = document.getElementById('breadcrumbs');
+
+        // Sections
+        const homeSection = document.getElementById('home-section');
+        const mapSection = document.getElementById('map-section');
+        const chaptersSection = document.getElementById('chapters-section');
+        const searchSection = document.getElementById('search-section');
+        const quotesSection = document.getElementById('quotes-section');
+        const timelineSection = document.getElementById('timeline-section');
+        const themesSection = document.getElementById('themes-section');
+        const symbolismSection = document.getElementById('symbolism-section');
+        const philosophySection = document.getElementById('philosophy-section');
+        const relatedSection = document.getElementById('related-section');
+
+        const allSections = [
+            homeSection, dynamicContentPanel, mapSection, chaptersSection, searchSection,
+            quotesSection, timelineSection, themesSection, symbolismSection, philosophySection, relatedSection
+        ];
+
+        // --- State Management & UI Rendering ---
+
+        function updateBreadcrumbs() {
+            const path = appState.navigationHistory.map(sectionId => {
+                let name = sectionId.charAt(0).toUpperCase() + sectionId.slice(1); // Default
+                if (sectionId === 'home') name = 'Home';
+                if (sectionId === 'map') name = 'Knowledge Map';
+                if (sectionId === 'themes') name = 'Themes';
+                if (sectionId === 'chapters') name = 'Chapters';
+                if (sectionId === 'symbolism') name = 'Symbolism';
+                if (sectionId === 'quotes') name = 'Quotes';
+                if (sectionId === 'philosophy') name = 'Philosophy';
+                if (sectionId === 'related') name = 'Related Concepts';
+                if (sectionId === 'search') name = 'Search';
+                if (sectionId === 'timeline') name = 'Timeline';
+
+                // For specific content items
+                if (sectionId.startsWith('theme-')) {
+                    const theme = bookData.themes.find(t => t.id === sectionId.split('-')[1]);
+                    if (theme) name = theme.title;
+                } else if (sectionId.startsWith('chapter-')) {
+                    const chapter = bookData.chapters.find(c => c.id === sectionId.split('-')[1]);
+                    if (chapter) name = chapter.title;
+                } else if (sectionId.startsWith('symbolism-')) {
+                    const symbol = bookData.symbolism.find(s => s.id === sectionId.split('-')[1]);
+                    if (symbol) name = symbol.title;
+                } else if (sectionId.startsWith('quote-')) {
+                    const quote = bookData.quotes.find(q => q.id === sectionId.split('-')[1]);
+                    if (quote) name = `Quote: "${quote.text.substring(0, 30)}..."`;
+                } else if (sectionId.startsWith('philosophy-')) {
+                    const phil = bookData.philosophy.find(p => p.id === sectionId.split('-')[1]);
+                    if (phil) name = phil.title;
+                } else if (sectionId.startsWith('mapnode-')) {
+                    const node = bookData.knowledgeMapNodes.find(n => n.id === sectionId.split('-')[1]);
+                    if (node) name = node.label;
+                }
+
+                return `<a href="#" data-section="${sectionId}">${name}</a>`;
+            }).join('<span> &rarr; </span>');
+            breadcrumbsContainer.innerHTML = path;
+        }
+
+        function navigateTo(sectionId, pushToHistory = true) {
+            // Hide all sections first
+            allSections.forEach(section => section.classList.add('hidden'));
+            dynamicContentPanel.classList.add('hidden'); // Ensure dynamic panel is hidden by default
+
+            // Update active link in sidebar
+            navLinks.forEach(link => link.classList.remove('active'));
+            const activeLink = document.querySelector(`.sidebar nav ul li a[data-section="${sectionId.split('-')[0]}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Update history
+            if (pushToHistory) {
+                if (appState.navigationHistory[appState.navigationHistory.length - 1] !== sectionId) {
+                    appState.navigationHistory.push(sectionId);
+                }
+            } else {
+                // If not pushing, it means we're going back or replacing
+                const index = appState.navigationHistory.indexOf(sectionId);
+                if (index > -1) {
+                    appState.navigationHistory = appState.navigationHistory.slice(0, index + 1);
+                } else {
+                    appState.navigationHistory = ['home', sectionId]; // Fallback
+                }
+            }
+            appState.currentSection = sectionId;
+            updateBreadcrumbs();
+
+            // Show the relevant section
+            if (sectionId === 'home') {
+                homeSection.classList.remove('hidden');
+            } else if (sectionId === 'map') {
+                mapSection.classList.remove('hidden');
+                renderKnowledgeMap();
+            } else if (sectionId === 'chapters') {
+                chaptersSection.classList.remove('hidden');
+                renderChapterExplorer();
+            } else if (sectionId === 'search') {
+                searchSection.classList.remove('hidden');
+            } else if (sectionId === 'quotes') {
+                quotesSection.classList.remove('hidden');
+                renderQuotes();
+            } else if (sectionId === 'timeline') {
+                timelineSection.classList.remove('hidden');
+                renderTimeline();
+            } else if (sectionId === 'themes') {
+                themesSection.classList.remove('hidden');
+                renderThemes();
+            } else if (sectionId === 'symbolism') {
+                symbolismSection.classList.remove('hidden');
+                renderSymbolism();
+            } else if (sectionId === 'philosophy') {
+                philosophySection.classList.remove('hidden');
+                renderPhilosophy();
+            } else if (sectionId === 'related') {
+                relatedSection.classList.remove('hidden');
+                renderRelatedConcepts();
+            }
+            // Handle dynamic content for specific items
+            else if (sectionId.startsWith('theme-')) {
+                renderDynamicContent('theme', sectionId.split('-')[1]);
+            } else if (sectionId.startsWith('chapter-')) {
+                renderDynamicContent('chapter', sectionId.split('-')[1]);
+            } else if (sectionId.startsWith('symbolism-')) {
+                renderDynamicContent('symbolism', sectionId.split('-')[1]);
+            } else if (sectionId.startsWith('quote-')) {
+                renderDynamicContent('quote', sectionId.split('-')[1]);
+            } else if (sectionId.startsWith('philosophy-')) {
+                renderDynamicContent('philosophy', sectionId.split('-')[1]);
+            } else if (sectionId.startsWith('mapnode-')) {
+                renderDynamicContent('mapnode', sectionId.split('-')[1]);
+            }
+
+            // Scroll to top of main content
+            mainContent.scrollTop = 0;
+        }
+
+        function renderDynamicContent(type, id) {
+            dynamicContentPanel.classList.remove('hidden');
+            panelContent.innerHTML = ''; // Clear previous content
+            let item;
+
+            switch (type) {
+                case 'theme':
+                    item = bookData.themes.find(t => t.id === id);
+                    if (item) {
+                        panelTitle.textContent = item.title;
+                        panelContent.innerHTML = `
+                            <p>${item.layer1}</p>
+                            <div class="collapsible-container">
+                                <div class="collapsible-header" data-target="layer2">
+                                    <h4>Detailed Explanation <span class="collapsible-icon">&gt;</span></h4>
+                                </div>
+                                <div class="collapsible-content" id="layer2">
+                                    <p>${item.layer2}</p>
+                                </div>
+                                <div class="collapsible-header" data-target="layer3">
+                                    <h4>Advanced Interpretation <span class="collapsible-icon">&gt;</span></h4>
+                                </div>
+                                <div class="collapsible-content" id="layer3">
+                                    <p>${item.layer3}</p>
+                                </div>
+                                <div class="collapsible-header" data-target="layer4">
+                                    <h4>Cross-disciplinary Analysis <span class="collapsible-icon">&gt;</span></h4>
+                                </div>
+                                <div class="collapsible-content" id="layer4">
+                                    <p>${item.layer4}</p>
+                                </div>
+                                <div class="collapsible-header" data-target="layer5">
+                                    <h4>Practical Implications <span class="collapsible-icon">&gt;</span></h4>
+                                </div>
+                                <div class="collapsible-content" id="layer5">
+                                    <p>${item.layer5}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    break;
+                case 'chapter':
+                    item = bookData.chapters.find(c => c.id === id);
+                    if (item) {
+                        panelTitle.textContent = item.title;
+                        panelContent.innerHTML = `
+                            <p>${item.summary}</p>
+                            <h4>Key Concepts:</h4>
+                            <ul>${item.concepts.map(c => `<li>${c}</li>`).join('')}</ul>
+                            <h4>Related Quotes:</h4>
+                            <div id="chapter-quotes-list"></div>
+                        `;
+                        const chapterQuotesList = document.getElementById('chapter-quotes-list');
+                        item.quotes.forEach(quoteId => {
+                            const quote = bookData.quotes.find(q => q.id === quoteId);
+                            if (quote) {
+                                chapterQuotesList.innerHTML += `
+                                    <div class="quote-item">
+                                        <p class="quote-text">"${quote.text}"</p>
+                                        <p class="quote-meta">Chapter: ${bookData.chapters.find(c => c.id === quote.chapter).title}</p>
+                                        <a href="#" class="quote-analysis-toggle" data-quote-id="${quote.id}">Show Analysis</a>
+                                        <div class="quote-analysis-content">
+                                            <p><strong>Interpretation:</strong> ${quote.interpretation}</p>
+                                            <p><strong>Thematic Significance:</strong> ${quote.thematicSignificance}</p>
+                                            <p><strong>Philosophical Implications:</strong> ${quote.philosophicalImplications}</p>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+                    }
+                    break;
+                case 'symbolism':
+                    item = bookData.symbolism.find(s => s.id === id);
+                    if (item) {
+                        panelTitle.textContent = item.title;
+                        panelContent.innerHTML = `
+                            <p>${item.description}</p>
+                            <h4>Related Themes:</h4>
+                            <ul>${item.relatedThemes.map(tId => {
+                                const theme = bookData.themes.find(t => t.id === tId);
+                                return `<li><a href="#" data-section="theme-${tId}">${theme ? theme.title : tId}</a></li>`;
+                            }).join('')}</ul>
+                        `;
+                    }
+                    break;
+                case 'quote':
+                    item = bookData.quotes.find(q => q.id === id);
+                    if (item) {
+                        panelTitle.textContent = `Quote: "${item.text.substring(0, 50)}..."`;
+                        panelContent.innerHTML = `
+                            <div class="quote-item">
+                                <p class="quote-text">"${item.text}"</p>
+                                <p class="quote-meta">Chapter: ${bookData.chapters.find(c => c.id === item.chapter).title}</p>
+                                <div class="quote-analysis-content expanded">
+                                    <p><strong>Interpretation:</strong> ${item.interpretation}</p>
+                                    <p><strong>Thematic Significance:</strong> ${item.thematicSignificance}</p>
+                                    <p><strong>Philosophical Implications:</strong> ${item.philosophicalImplications}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    break;
+                case 'philosophy':
+                    item = bookData.philosophy.find(p => p.id === id);
+                    if (item) {
+                        panelTitle.textContent = item.title;
+                        panelContent.innerHTML = `
+                            <p>${item.summary}</p>
+                            <h4>Key Thinkers:</h4>
+                            <ul>${item.keyThinkers.map(t => `<li>${t}</li>`).join('')}</ul>
+                            <h4>Related Themes:</h4>
+                            <ul>${item.relatedThemes.map(tId => {
+                                const theme = bookData.themes.find(t => t.id === tId);
+                                return `<li><a href="#" data-section="theme-${tId}">${theme ? theme.title : tId}</a></li>`;
+                            }).join('')}</ul>
+                        `;
+                    }
+                    break;
+                case 'mapnode':
+                    item = bookData.knowledgeMapNodes.find(n => n.id === id);
+                    if (item) {
+                        panelTitle.textContent = item.label;
+                        let contentHtml = `<p>Type: ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</p>`;
+                        if (item.type === 'theme') {
+                            const theme = bookData.themes.find(t => t.id === id);
+                            if (theme) contentHtml += `<p>${theme.layer1}</p><p><a href="#" data-section="theme-${id}">Explore Theme in Detail</a></p>`;
+                        } else if (item.type === 'symbolism') {
+                            const symbol = bookData.symbolism.find(s => s.id === id.replace('_sym', ''));
+                            if (symbol) contentHtml += `<p>${symbol.description}</p><p><a href="#" data-section="symbolism-${id.replace('_sym', '')}">Explore Symbolism in Detail</a></p>`;
+                        } else if (item.type === 'philosophy') {
+                            const phil = bookData.philosophy.find(p => p.id === id.replace('_phil', ''));
+                            if (phil) contentHtml += `<p>${phil.summary}</p><p><a href="#" data-section="philosophy-${id.replace('_phil', '')}">Explore Philosophy in Detail</a></p>`;
+                        } else if (item.type === 'character') {
+                            contentHtml += `<p>Anya is the central protagonist, navigating the labyrinth and confronting the core philosophical questions of identity, consciousness, and free will.</p>`;
+                        }
+                        panelContent.innerHTML = contentHtml;
+                    }
+                    break;
+            }
+            addCollapsibleListeners();
+            addQuoteAnalysisListeners();
+        }
+
+        function addCollapsibleListeners() {
+            document.querySelectorAll('.collapsible-header').forEach(header => {
+                header.onclick = (e) => {
+                    e.preventDefault();
+                    const targetId = header.dataset.target;
+                    const content = document.getElementById(targetId);
+                    if (content) {
+                        header.classList.toggle('expanded');
+                        content.classList.toggle('expanded');
+                    }
+                };
+            });
+        }
+
+        function addQuoteAnalysisListeners() {
+            document.querySelectorAll('.quote-analysis-toggle').forEach(toggle => {
+                toggle.onclick = (e) => {
+                    e.preventDefault();
+                    const content = toggle.nextElementSibling;
+                    if (content) {
+                        content.classList.toggle('expanded');
+                        toggle.textContent = content.classList.contains('expanded') ? 'Hide Analysis' : 'Show Analysis';
+                    }
+                };
+            });
+        }
+
+        // --- Render Functions for Sections ---
+
+        function renderKnowledgeMap() {
+            const mapContainer = document.getElementById('knowledge-map');
+            mapContainer.innerHTML = ''; // Clear previous map
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.zIndex = '0';
+            mapContainer.appendChild(svg);
+
+            // Render lines first
+            bookData.knowledgeMapEdges.forEach(edge => {
+                const fromNode = bookData.knowledgeMapNodes.find(node => node.id === edge.from);
+                const toNode = bookData.knowledgeMapNodes.find(node => node.id === edge.to);
+
+                if (fromNode && toNode) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute('x1', fromNode.x + 50); // +50 for center of node
+                    line.setAttribute('y1', fromNode.y + 50);
+                    line.setAttribute('x2', toNode.x + 50);
+                    line.setAttribute('y2', toNode.y + 50);
+                    line.setAttribute('stroke', 'rgba(255, 255, 255, 0.2)');
+                    line.setAttribute('stroke-width', '2');
+                    svg.appendChild(line);
+                }
+            });
+
+            // Render nodes
+            bookData.knowledgeMapNodes.forEach(node => {
+                const nodeElement = document.createElement('div');
+                nodeElement.classList.add('map-node');
+                nodeElement.textContent = node.label;
+                nodeElement.style.left = `${node.x}px`;
+                nodeElement.style.top = `${node.y}px`;
+                nodeElement.dataset.nodeId = node.id;
+                nodeElement.onclick = () => {
+                    // Remove active class from all nodes
+                    document.querySelectorAll('.map-node').forEach(n => n.classList.remove('active'));
+                    // Add active class to clicked node
+                    nodeElement.classList.add('active');
+                    appState.activeNode = node.id;
+                    navigateTo(`mapnode-${node.id}`);
+                };
+                mapContainer.appendChild(nodeElement);
+            });
+
+            // Highlight active node if any
+            if (appState.activeNode) {
+                const activeNodeElement = mapContainer.querySelector(`[data-node-id="${appState.activeNode}"]`);
+                if (activeNodeElement) {
+                    activeNodeElement.classList.add('active');
+                }
+            }
+        }
+
+        function renderChapterExplorer() {
+            const chapterExplorer = document.getElementById('chapter-explorer');
+            chapterExplorer.innerHTML = '';
+
+            const renderChapterList = (chapters, parentElement) => {
+                const ul = document.createElement('ul');
+                chapters.forEach(chapter => {
+                    const li = document.createElement('li');
+                    const chapterItem = document.createElement('div');
+                    chapterItem.classList.add('chapter-item');
+                    chapterItem.dataset.chapterId = chapter.id;
+                    chapterItem.innerHTML = `
+                        <span>${chapter.title}</span>
+                        <span class="chapter-toggle">&gt;</span>
+                    `;
+                    li.appendChild(chapterItem);
+
+                    const chapterContent = document.createElement('div');
+                    chapterContent.classList.add('chapter-content');
+                    chapterContent.innerHTML = `
+                        <p>${chapter.summary}</p>
+                        <h4>Concepts:</h4>
+                        <ul>${chapter.concepts.map(c => `<li>${c}</li>`).join('')}</ul>
+                        <h4>Quotes:</h4>
+                        <ul>${chapter.quotes.map(qId => {
+                            const quote = bookData.quotes.find(q => q.id === qId);
+                            return `<li><a href="#" data-section="quote-${qId}">${quote ? quote.text.substring(0, 50) + '...' : qId}</a></li>`;
+                        }).join('')}</ul>
+                        <p><a href="#" data-section="chapter-${chapter.id}">Read Full Chapter Analysis</a></p>
+                    `;
+                    li.appendChild(chapterContent);
+                    ul.appendChild(li);
+
+                    chapterItem.onclick = (e) => {
+                        e.preventDefault();
+                        chapterItem.classList.toggle('expanded');
+                        chapterContent.classList.toggle('expanded');
+                    };
+                });
+                parentElement.appendChild(ul);
+            };
+
+            renderChapterList(bookData.chapters, chapterExplorer);
+        }
+
+        function renderQuotes() {
+            const quotesList = document.getElementById('quotes-list');
+            quotesList.innerHTML = '';
+            bookData.quotes.forEach(quote => {
+                quotesList.innerHTML += `
+                    <div class="quote-item">
+                        <p class="quote-text">"${quote.text}"</p>
+                        <p class="quote-meta">Chapter: ${bookData.chapters.find(c => c.id === quote.chapter).title}</p>
+                        <a href="#" class="quote-analysis-toggle" data-quote-id="${quote.id}">Show Analysis</a>
+                        <div class="quote-analysis-content">
+                            <p><strong>Interpretation:</strong> ${quote.interpretation}</p>
+                            <p><strong>Thematic Significance:</strong> ${quote.thematicSignificance}</p>
+                            <p><strong>Philosophical Implications:</strong> ${quote.philosophicalImplications}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            addQuoteAnalysisListeners();
+        }
+
+        function renderTimeline() {
+            const timelineContainer = document.getElementById('timeline-container');
+            timelineContainer.innerHTML = '';
+            bookData.timeline.forEach(item => {
+                timelineContainer.innerHTML += `
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-item-content">
+                            <span class="date">${item.year}</span>
+                            <h4>${item.title}</h4>
+                            <p>${item.description}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderThemes() {
+            const themesContent = document.getElementById('themes-content');
+            themesContent.innerHTML = '';
+            bookData.themes.forEach(theme => {
+                themesContent.innerHTML += `
+                    <div class="collapsible-container">
+                        <div class="collapsible-header" data-target="theme-summary-${theme.id}">
+                            <h4>${theme.title} <span class="collapsible-icon">&gt;</span></h4>
+                        </div>
+                        <div class="collapsible-content" id="theme-summary-${theme.id}">
+                            <p>${theme.layer1}</p>
+                            <p><a href="#" data-section="theme-${theme.id}">Explore Full Theme Analysis</a></p>
+                        </div>
+                    </div>
+                `;
+            });
+            addCollapsibleListeners();
+        }
+
+        function renderSymbolism() {
+            const symbolismContent = document.getElementById('symbolism-content');
+            symbolismContent.innerHTML = '';
+            bookData.symbolism.forEach(symbol => {
+                symbolismContent.innerHTML += `
+                    <div class="collapsible-container">
+                        <div class="collapsible-header" data-target="symbolism-summary-${symbol.id}">
+                            <h4>${symbol.title} <span class="collapsible-icon">&gt;</span></h4>
+                        </div>
+                        <div class="collapsible-content" id="symbolism-summary-${symbol.id}">
+                            <p>${symbol.description}</p>
+                            <p><a href="#" data-section="symbolism-${symbol.id}">Explore Full Symbolism Analysis</a></p>
+                        </div>
+                    </div>
+                `;
+            });
+            addCollapsibleListeners();
+        }
+
+        function renderPhilosophy() {
+            const philosophyContent = document.getElementById('philosophy-content');
+            philosophyContent.innerHTML = '';
+            bookData.philosophy.forEach(phil => {
+                philosophyContent.innerHTML += `
+                    <div class="collapsible-container">
+                        <div class="collapsible-header" data-target="philosophy-summary-${phil.id}">
+                            <h4>${phil.title} <span class="collapsible-icon">&gt;</span></h4>
+                        </div>
+                        <div class="collapsible-content" id="philosophy-summary-${phil.id}">
+                            <p>${phil.summary}</p>
+                            <p><a href="#" data-section="philosophy-${phil.id}">Explore Full Philosophical Context</a></p>
+                        </div>
+                    </div>
+                `;
+            });
+            addCollapsibleListeners();
+        }
+
+        function renderRelatedConcepts() {
+            const relatedContent = document.getElementById('related-content');
+            relatedContent.innerHTML = `
+                <p>This section would dynamically suggest related concepts based on your current exploration. Since there's no backend, here are some general connections:</p>
+                <h4>Related Themes:</h4>
+                <ul>
+                    ${bookData.themes.map(t => `<li><a href="#" data-section="theme-${t.id}">${t.title}</a></li>`).join('')}
+                </ul>
+                <h4>Related Philosophical Ideas:</h4>
+                <ul>
+                    ${bookData.philosophy.map(p => `<li><a href="#" data-section="philosophy-${p.id}">${p.title}</a></li>`).join('')}
+                </ul>
+                <h4>Key Symbols:</h4>
+                <ul>
+                    ${bookData.symbolism.map(s => `<li><a href="#" data-section="symbolism-${s.id}">${s.title}</a></li>`).join('')}
+                </ul>
+            `;
+        }
+
+
+        // --- Event Listeners ---
+
+        // Sidebar Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = e.target.dataset.section;
+                navigateTo(sectionId);
+            });
+        });
+
+        // Breadcrumbs Navigation
+        breadcrumbsContainer.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A' && e.target.dataset.section) {
+                e.preventDefault();
+                navigateTo(e.target.dataset.section, false); // Don't push to history, just navigate back
+            }
+        });
+
+        // Search Functionality
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            searchResults.innerHTML = '';
+            if (query.length < 2) {
+                return;
+            }
+
+            const matches = [];
+
+            // Search Themes
+            bookData.themes.forEach(theme => {
+                if (theme.title.toLowerCase().includes(query) ||
+                    theme.layer1.toLowerCase().includes(query) ||
+                    theme.layer2.toLowerCase().includes(query)) {
+                    matches.push({ type: 'Theme', id: `theme-${theme.id}`, title: theme.title, snippet: theme.layer1 });
+                }
+            });
+
+            // Search Chapters
+            bookData.chapters.forEach(chapter => {
+                if (chapter.title.toLowerCase().includes(query) ||
+                    chapter.summary.toLowerCase().includes(query) ||
+                    chapter.concepts.some(c => c.toLowerCase().includes(query))) {
+                    matches.push({ type: 'Chapter', id: `chapter-${chapter.id}`, title: chapter.title, snippet: chapter.summary });
+                }
+            });
+
+            // Search Symbolism
+            bookData.symbolism.forEach(symbol => {
+                if (symbol.title.toLowerCase().includes(query) ||
+                    symbol.description.toLowerCase().includes(query)) {
+                    matches.push({ type: 'Symbolism', id: `symbolism-${symbol.id}`, title: symbol.title, snippet: symbol.description });
+                }
+            });
+
+            // Search Quotes
+            bookData.quotes.forEach(quote => {
+                if (quote.text.toLowerCase().includes(query) ||
+                    quote.interpretation.toLowerCase().includes(query)) {
+                    matches.push({ type: 'Quote', id: `quote-${quote.id}`, title: `Quote: "${quote.text.substring(0, 50)}..."`, snippet: quote.interpretation });
+                }
+            });
+
+            // Display results
+            if (matches.length > 0) {
+                matches.forEach(match => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('search-result-item');
+                    resultItem.innerHTML = `
+                        <h4>${match.title} (${match.type})</h4>
+                        <p>${match.snippet.substring(0, 150)}...</p>
+                    `;
+                    resultItem.onclick = () => navigateTo(match.id);
+                    searchResults.appendChild(resultItem);
+                });
+            } else {
+                searchResults.innerHTML = '<p>No results found.</p>';
+            }
+        });
+
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            navigateTo('home'); // Start on the home section
+        });
+
+    </script>
+</body>
+</html>
