@@ -1,3 +1,7 @@
 .qwen/
 text/
-.htaccess
+.claude/
+.opencode/
+.cursor/
+.env*
+site.tar.gz
