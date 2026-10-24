@@ -1,0 +1,6 @@
+Options -Indexes
+
+# Defense in depth when the host-level policy has not yet been installed.
+RewriteEngine On
+RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,END]
+RewriteRule (^|/)(?:(?:AGENTS|CLAUDE|QWEN)\.md|opencode\.jsonc?)$ - [F,END,NC]

@@ -61,3 +61,41 @@ To add a new theme drill-down card, append another object to `BOOK_DATA.themes` 
 
 - The site does not depend on npm, a framework, or a build step.
 - Keeping the experience in one file makes quick edits easier and lowers the chance of another broken generation step.
+
+## Deployment (VEC-1029)
+
+Keep the source checkout and all agent configuration outside the web root. Build
+an allowlisted artifact from the reviewed source revision:
+
+```sh
+python3 package_site.py /tmp/autobioyogi-site.tar.gz
+tar -tzf /tmp/autobioyogi-site.tar.gz
+```
+
+The archive contains exactly `index.html`, `reader.html`, and `.htaccess`. Both
+pages embed their data; `text/` and the legacy generator are not runtime assets.
+Deploy only these archive members into the site's `autobioyogi/` directory.
+Do not copy the checkout recursively or use `git pull` in a document root.
+`.gitignore` alone is not a deployment exclusion. The package allowlist excludes
+agent settings, Git metadata, environment files, source instructions, legacy
+snapshots, and build/operations scripts even if new ones are added to the source.
+Add future public assets explicitly to `PUBLIC_FILES` after review.
+
+The host-level policy is versioned in
+`ops/polloanalytics-development-paths.conf`. Install it with:
+
+```sh
+sudo install -o root -g root -m 0644 ops/polloanalytics-development-paths.conf /etc/apache2/conf-available/polloanalytics-development-paths.conf
+sudo a2enconf polloanalytics-development-paths
+sudo apache2ctl configtest
+sudo systemctl reload apache2
+```
+
+It denies hidden directories/files and agent instruction/configuration files in
+both the main and fileshare document roots. `.well-known/` remains allowed,
+including certificate-validation files; hidden descendants are still denied.
+The shipped `.htaccess` also blocks sensitive paths on Apache hosts with
+`mod_rewrite` and `AllowOverride` enabled. Verify the homepage and reader return
+200, agent settings and Git metadata return 403/404, and a temporary plain-text
+ACME challenge file returns 200 over HTTP (following HTTPS redirects) and HTTPS.
+Remove the challenge fixture afterward.
